@@ -1,6 +1,8 @@
 # WebP to MP4 Converter
 A Python-based GUI application that converts animated WebP files to MP4 format. This tool supports batch processing, allowing you to convert multiple WebP files simultaneously while monitoring the conversion progress.
 ![WebP to MP4 Converter Screenshot]
+![Screenshot](https://github.com/user-attachments/assets/8b11f046-0361-4390-a815-134edd5ac834)
+
 ## Features
 - User-friendly graphical interface
  Batch processing support
