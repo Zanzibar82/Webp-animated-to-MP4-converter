@@ -1,3 +1,13 @@
+Find the original work here https://github.com/tstrongr/Webp-animated-to-MP4-converter
+
+I am forking tstrongr's work to learn and hopefully make this tool more functional.
+
+On Windows 10, open PowerShell as Admin and install the following to use the "_dd.py" (drag & drop) version:
+
+ ```bash
+ pip install tkinterdnd2
+ ```
+
 # WebP to MP4 Converter
 A Python-based GUI application that converts animated WebP files to MP4 format. This tool supports batch processing, allowing you to convert multiple WebP files simultaneously while monitoring the conversion progress.
 ![WebP to MP4 Converter Screenshot]
