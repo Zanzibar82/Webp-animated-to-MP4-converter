@@ -110,23 +110,47 @@ class WebpToMP4Converter:
         if self.output_folder:
             self.status_label.config(text=f"Output folder: {self.output_folder}")
 
-    def webp_to_mp4(self, input_path, output_path, fps=30):
+    def webp_to_mp4(self, input_path, output_path):
         try:
             webp = Image.open(input_path)
             width, height = webp.size
-            
+
+            # 1. CHECK IF IT'S ANIMATED
+            if not getattr(webp, 'is_animated', False):
+                self.log_debug(f"{os.path.basename(input_path)} is not animated. Skipping.")
+                return False
+
+            total_duration_ms = 0
+            frame_count = webp.n_frames
+
+            # 2. CALCULATE TOTAL DURATION OF THE ANIMATION
+            for i in range(frame_count):
+                webp.seek(i)
+                total_duration_ms += webp.info.get('duration', 100) # Default to 100ms (10 FPS) if no duration is found
+
+            # 3. CALCULATE AVERAGE FPS
+            # Total duration is in milliseconds, so convert to seconds: / 1000
+            average_fps = frame_count / (total_duration_ms / 1000.0)
+
+            # 4. Apply a sensible FPS clamp to avoid errors with very slow or very fast source files
+            # This is a common practice to handle edge cases
+            clamped_fps = max(5, min(60, average_fps)) # Clamp FPS between 5 and 60
+            self.log_debug(f"Calculated FPS: {average_fps:.2f}, Using: {clamped_fps:.2f}")
+
             fourcc = cv2.VideoWriter_fourcc(*'mp4v')
-            out = cv2.VideoWriter(output_path, fourcc, fps, (width, height))
-            
+            # Use the calculated (and clamped) FPS
+            out = cv2.VideoWriter(output_path, fourcc, clamped_fps, (width, height))
+
+            # 5. WRITE EACH FRAME
             try:
-                while True:
-                    frame = cv2.cvtColor(np.array(webp), cv2.COLOR_RGB2BGR)
-                    out.write(frame)
-                    webp.seek(webp.tell() + 1)
-            except EOFError:
-                pass
+                for frame_index in range(frame_count):
+                    webp.seek(frame_index)
+                    # Convert PIL Image to OpenCV format (BGR)
+                    frame_cv = cv2.cvtColor(np.array(webp.convert('RGB')), cv2.COLOR_RGB2BGR)
+                    out.write(frame_cv)
             finally:
                 out.release()
+                self.log_debug(f"Successfully wrote {frame_count} frames at {clamped_fps:.2f} FPS.")
             return True
         except Exception as e:
             messagebox.showerror("Error", f"Error converting {os.path.basename(input_path)}: {str(e)}")
