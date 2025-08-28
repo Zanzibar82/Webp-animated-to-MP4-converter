@@ -11,7 +11,7 @@ try:
     HAS_DND = True
 except ImportError:
     HAS_DND = False
-    print("tkinterdnd2 non installato. Il drag-and-drop non sarà disponibile.")
+    print("tkinterdnd2 not installed. Drag-and-drop feature won't be available.")
 
 class WebpToMP4Converter:
     def __init__(self, root):
@@ -57,8 +57,8 @@ class WebpToMP4Converter:
         
         self.listbox = tk.Listbox(self.files_frame, selectmode=tk.EXTENDED)
         self.listbox.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
-        #drag-and-drop
-
+        
+        #drag-and-drop feature
         if HAS_DND:
             self.listbox.drop_target_register(DND_FILES)
             self.listbox.dnd_bind('<<Drop>>', self.on_drop)
